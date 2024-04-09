@@ -25,9 +25,11 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.selector.BasicContextSelector;
 import org.apache.logging.log4j.core.test.junit.ContextSelectorType;
+import org.apache.logging.log4j.kit.env.Log4jProperty;
 import org.apache.logging.log4j.kit.env.PropertyEnvironment;
 import org.apache.logging.log4j.plugins.Inject;
 import org.apache.logging.log4j.plugins.di.ConfigurableInstanceFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisabledUntil;
 
@@ -43,7 +45,7 @@ public class NamedLoggerContextPropertiesTest {
         assertEquals(LifeCycle.State.STARTED, context.getState());
         final PropertyEnvironment props = context.getEnvironment();
         assertNotNull(props, "Logger Context Properties were not loaded");
-        final String scriptLanguages = props.getStringProperty("Script.enableLanguages");
+        final String scriptLanguages = props.getProperty(Script.class).enableLanguages();
         assertEquals("Groovy,JavaScript", scriptLanguages);
         final Configuration config = context.getConfiguration();
         assertNotNull(config, "Configuration was not created");
@@ -51,6 +53,9 @@ public class NamedLoggerContextPropertiesTest {
         LogManager.shutdown();
         assertEquals(LifeCycle.State.STOPPED, context.getState());
     }
+
+    @Log4jProperty
+    private record Script(@Nullable String enableLanguages) {}
 
     public static class TestContextSelector extends BasicContextSelector {
 
